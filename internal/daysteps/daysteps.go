@@ -3,6 +3,7 @@ package daysteps
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +21,7 @@ const (
 var (
 	ErrWrongFormat            = errors.New("wrong data format")
 	ErrIncorrectNumberOfSteps = errors.New("incorrect number of steps")
+	ErrZeroDuration           = errors.New("zero duration")
 )
 
 func parsePackage(data string) (int, time.Duration, error) {
@@ -45,6 +47,10 @@ func parsePackage(data string) (int, time.Duration, error) {
 		return 0, 0, err
 	}
 
+	if duration <= 0 {
+		return 0, 0, ErrZeroDuration
+	}
+
 	return steps, duration, nil
 }
 
@@ -52,7 +58,7 @@ func DayActionInfo(data string, weight, height float64) string {
 	steps, duration, err := parsePackage(data)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return ""
 	}
 
@@ -66,8 +72,8 @@ func DayActionInfo(data string, weight, height float64) string {
 
 	return fmt.Sprintf(
 		"Количество шагов: %d.\n"+
-			"Дистанция составила: %.2f км.\n"+
-			"Вы сожгли: %.2f ккал.\n",
+			"Дистанция составила %.2f км.\n"+
+			"Вы сожгли %.2f ккал.\n",
 		steps, distance, calories,
 	)
 }
